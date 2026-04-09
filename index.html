@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="description" content="Unofficial training and reference tool for 2T2 Aerial Porters.">
+<meta name="theme-color" content="#f59e0b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Port Dawg">
+<link rel="manifest" href="manifest.json">
+<title>Port Dawg — 2T2 Pocket Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0c10;--surface:#12151c;--surface2:#1a1f2a;--border:#252b38;--amber:#f59e0b;--amber-dim:#92600a;--green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;--text:#e2e8f0;--muted:#64748b;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--display:'Bebas Neue',sans-serif}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans)}
+  .shell{display:flex;flex-direction:column;height:100%;max-width:440px;margin:0 auto;border-left:1px solid var(--border);border-right:1px solid var(--border);overflow:hidden}
+  .header{background:var(--surface);border-bottom:2px solid var(--amber);padding:10px 16px 8px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+  .header-title{font-family:var(--display);font-size:26px;letter-spacing:2px;color:var(--amber);line-height:1}
+  .header-sub{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;display:block}
+  .header-badge{font-family:var(--mono);font-size:9px;border:1px solid var(--amber-dim);color:var(--amber);padding:3px 7px;border-radius:3px;letter-spacing:1px}
+  .screens{flex:1;overflow:hidden;position:relative}
+  .screen{position:absolute;inset:0;overflow-y:auto;padding:14px;display:none;flex-direction:column;gap:12px}
+  .screen.active{display:flex}
+  /* HOME */
+  .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .home-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 14px;cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+  .home-card:active{background:var(--surface2)}
+  .home-card.full{grid-column:1/-1}
+  .home-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--card-accent,var(--amber))}
+  .home-card:hover{border-color:var(--card-accent,var(--amber))}
+  .card-icon{font-size:22px}.card-label{font-family:var(--display);font-size:18px;letter-spacing:1px;color:var(--text);line-height:1}
+  .card-desc{font-size:11px;color:var(--muted);line-height:1.4}
+  .disclaimer{background:#1a1208;border:1px solid var(--amber-dim);border-radius:6px;padding:10px 12px;font-family:var(--mono);font-size:10px;color:var(--amber);line-height:1.5;letter-spacing:.3px}
+  /* COMMON */
+  .section-header{font-family:var(--display);font-size:22px;letter-spacing:2px;color:var(--amber);border-bottom:1px solid var(--border);padding-bottom:8px}
+  .back-btn{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--muted);cursor:pointer;padding:4px 0;width:fit-content}
+  .back-btn:hover{color:var(--amber)}
+  .info-box{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:8px 10px;font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.6}
+  .info-box strong{color:var(--text)}
+  hr.divider{border:none;border-top:1px solid var(--border);margin:2px 0}
+  /* CALC */
+  .calc-tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .calc-tab{font-family:var(--mono);font-size:10px;padding:5px 10px;border-radius:4px;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s}
+  .calc-tab.active{background:var(--amber);color:#000;border-color:var(--amber)}
+  .calc-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:12px}
+  .calc-title{font-family:var(--mono);font-size:11px;color:var(--amber);letter-spacing:1px}
+  .field-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  input[type=number],input[type=text]{background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:14px;padding:9px 11px;width:100%;outline:none;transition:border-color .15s;-moz-appearance:textfield}
+  input[type=number]::-webkit-inner-spin-button{display:none}
+  input:focus,select:focus{border-color:var(--amber)}
+  select{background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:var(--mono);font-size:13px;padding:9px 10px;width:100%;outline:none;transition:border-color .15s}
+  .btn{background:var(--amber);color:#000;font-family:var(--display);font-size:16px;letter-spacing:2px;border:none;border-radius:5px;padding:11px;cursor:pointer;width:100%;transition:opacity .15s}
+  .btn:active{opacity:.8}
+  .btn.secondary{background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:13px;letter-spacing:1px}
+  .axle-row{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+  .axle-label{font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:1px}
+  .result-box{background:var(--bg);border:1px solid var(--green);border-radius:6px;padding:14px}
+  .result-box.hidden{display:none}
+  .result-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+  .result-value{font-family:var(--display);font-size:36px;color:var(--green);letter-spacing:2px}
+  .result-sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:4px;line-height:1.6}
+  .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  /* CHECKLISTS */
+  .cl-tab-row{display:flex;gap:6px;flex-wrap:wrap}
+  .cl-tab{font-family:var(--mono);font-size:10px;padding:5px 10px;border-radius:4px;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s}
+  .cl-tab.active{background:var(--amber);color:#000;border-color:var(--amber)}
+  .progress-bar{background:var(--surface);border-radius:4px;height:5px;overflow:hidden}
+  .progress-fill{height:100%;background:var(--green);border-radius:4px;transition:width .3s}
+  .progress-label{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:right;margin-top:4px}
+  .checklist{display:flex;flex-direction:column;gap:6px}
+  .check-cat{font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:1px;text-transform:uppercase;margin-top:8px;margin-bottom:2px;padding-left:2px}
+  .check-item{display:flex;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px;cursor:pointer;transition:border-color .15s}
+  .check-item.done{border-color:var(--green);background:#0d1f12}
+  .check-box{width:20px;height:20px;border:2px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px}
+  .check-item.done .check-box{background:var(--green);border-color:var(--green)}
+  .check-box svg{display:none}
+  .check-item.done .check-box svg{display:block}
+  .check-text{font-size:13px;line-height:1.5;color:var(--text)}
+  .check-item.done .check-text{color:var(--muted);text-decoration:line-through}
+  .check-ref{font-family:var(--mono);font-size:9px;color:var(--blue);margin-top:2px}
+  .reset-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:7px;border-radius:5px;cursor:pointer;width:100%}
+  /* GUIDES */
+  .guide-nav-item{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .15s;margin-bottom:8px}
+  .guide-nav-item:hover{border-color:var(--blue)}
+  .guide-nav-left{display:flex;align-items:center;gap:12px}
+  .guide-icon{font-size:20px}
+  .guide-name{font-family:var(--display);font-size:17px;letter-spacing:1px}
+  .guide-tasks{font-family:var(--mono);font-size:10px;color:var(--muted)}
+  .guide-block{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:14px;margin-bottom:10px}
+  .guide-block-title{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+  .guide-block p{font-size:13px;line-height:1.6;color:var(--text)}
+  .guide-block ul{padding-left:16px;display:flex;flex-direction:column;gap:5px}
+  .guide-block li{font-size:13px;line-height:1.5;color:var(--text)}
+  .mistake-item{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border)}
+  .mistake-item:last-child{border-bottom:none}
+  .mistake-dot{width:6px;height:6px;border-radius:50%;background:var(--red);margin-top:5px;flex-shrink:0}
+  .mistake-text{font-size:13px;color:var(--text);line-height:1.5}
+  .reg-ref{font-family:var(--mono);font-size:10px;color:var(--blue);background:#0d1320;border:1px solid #1e2d45;border-radius:4px;padding:8px;line-height:1.6}
+  /* PUBS */
+  .pub-category{font-family:var(--mono);font-size:10px;color:var(--purple);letter-spacing:1px;text-transform:uppercase;margin-top:4px;margin-bottom:4px}
+  .pub-card{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:13px;margin-bottom:7px}
+  .pub-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .pub-name{font-family:var(--mono);font-size:12px;color:var(--amber);font-weight:600;line-height:1.3}
+  .pub-badge{font-family:var(--mono);font-size:9px;border:1px solid var(--border);color:var(--muted);padding:2px 6px;border-radius:3px;flex-shrink:0}
+  .pub-badge.public{border-color:var(--green);color:var(--green)}
+  .pub-full-name{font-size:12px;color:var(--text);margin-top:5px;line-height:1.4}
+  .pub-desc{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.5}
+  .pub-covers{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+  .pub-tag{font-family:var(--mono);font-size:9px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:2px 6px;border-radius:3px}
+  .pub-url{font-family:var(--mono);font-size:10px;color:var(--blue);margin-top:8px;word-break:break-all;line-height:1.4}
+  /* QUIZ */
+  .quiz-bank-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .quiz-bank-tab{font-family:var(--mono);font-size:10px;padding:5px 10px;border-radius:4px;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .15s}
+  .quiz-bank-tab.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+  .quiz-counter{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px}
+  .quiz-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px}
+  .quiz-scenario{font-family:var(--mono);font-size:12px;color:var(--amber);background:#1a1208;border:1px solid var(--amber-dim);border-radius:5px;padding:10px;margin-bottom:14px;line-height:1.6}
+  .quiz-q{font-size:14px;line-height:1.6;color:var(--text);margin-bottom:10px}
+  .quiz-src{font-family:var(--mono);font-size:9px;color:var(--blue);margin-bottom:12px}
+  .quiz-options{display:flex;flex-direction:column;gap:8px}
+  .quiz-opt{border:1px solid var(--border);border-radius:6px;padding:11px 14px;font-size:13px;cursor:pointer;transition:all .15s;background:var(--bg);color:var(--text);text-align:left;font-family:var(--sans)}
+  .quiz-opt:hover:not(:disabled){border-color:var(--blue)}
+  .quiz-opt.correct{border-color:var(--green);background:#0d1f12;color:var(--green)}
+  .quiz-opt.wrong{border-color:var(--red);background:#1f0d0d;color:var(--red)}
+  .quiz-feedback{font-family:var(--mono);font-size:11px;line-height:1.6;padding:10px;border-radius:5px;margin-top:8px}
+  .quiz-feedback.correct{background:#0d1f12;color:var(--green)}
+  .quiz-feedback.wrong{background:#1f0d0d;color:var(--red)}
+  .score-display{text-align:center;padding:20px}
+  .score-big{font-family:var(--display);font-size:72px;color:var(--amber);line-height:1}
+  .score-label{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:4px}
+  /* NAV */
+  .navbar{background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;display:grid;grid-template-columns:repeat(5,1fr)}
+  .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 8px;cursor:pointer;transition:color .15s;color:var(--muted)}
+  .nav-item.active{color:var(--amber)}
+  .nav-icon{font-size:18px}
+  .nav-label{font-family:var(--mono);font-size:8px;letter-spacing:.5px;text-transform:uppercase}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="header">
+    <div><span class="header-title">PORT DAWG</span><span class="header-sub">2T2 Pocket Guide · v2.1</span></div>
+    <span class="header-badge" id="online-badge">OFFLINE</span>
+  </div>
+  <div class="screens">
+
+    <!-- HOME -->
+    <div class="screen active" id="screen-home">
+      <div class="home-grid">
+        <div class="home-card" style="--card-accent:#f59e0b" onclick="showScreen('calc')"><span class="card-icon">⚖️</span><span class="card-label">Calculators</span><span class="card-desc">CoB · pallet · PAX weight</span></div>
+        <div class="home-card" style="--card-accent:#22c55e" onclick="showScreen('checklist')"><span class="card-icon">✅</span><span class="card-label">Checklists</span><span class="card-desc">JI · Cargo · Ramp · PAX</span></div>
+        <div class="home-card" style="--card-accent:#3b82f6" onclick="showScreen('guides')"><span class="card-icon">📖</span><span class="card-label">Section Guides</span><span class="card-desc">Work center reference cards</span></div>
+        <div class="home-card" style="--card-accent:#a855f7" onclick="showScreen('quiz')"><span class="card-icon">🎯</span><span class="card-label">Practice</span><span class="card-desc">Reg-based quiz mode</span></div>
+        <div class="home-card full" style="--card-accent:#38bdf8" onclick="showScreen('pubs')"><span class="card-icon">📚</span><span class="card-label">Publications Library</span><span class="card-desc">All public 2T2 pubs · CFETP · AFIs · DTR · AFMAN</span></div>
+      </div>
+      <div class="disclaimer">⚠️ UNOFFICIAL — Training &amp; reference use only.<br>Do not enter sensitive or classified information.<br>Not affiliated with the U.S. Air Force or DoD.</div>
+    </div>
+
+    <!-- CALCULATORS -->
+    <div class="screen" id="screen-calc">
+      <div class="back-btn" onclick="showScreen('home')">← BACK</div>
+      <div class="section-header">CALCULATORS</div>
+      <div class="calc-tabs">
+        <div class="calc-tab active" onclick="switchCalc('cob')">CoB</div>
+        <div class="calc-tab" onclick="switchCalc('pallet')">Pallet</div>
+        <div class="calc-tab" onclick="switchCalc('pax')">PAX Weight</div>
+      </div>
+      <!-- CoB -->
+      <div id="calc-cob">
+        <div class="calc-box">
+          <div class="calc-title">CENTER OF BALANCE — CARGO / VEHICLE</div>
+          <div class="info-box"><strong>Formula: (D×W per axle, summed) ÷ Gross Weight = CB from RDL</strong><br>RDL = Reference Datum Line = front edge of vehicle or item.<br>Result = inches aft of RDL. Round .5+ up; drop .4 and below.<br>Ref: <strong>DTR 4500.9-R App P · FM 55-17 Ch 17</strong></div>
+          <div>
+            <div class="field-label">Cargo Type</div>
+            <select id="cargo-type" onchange="updateCargoType()">
+              <option value="wheeled2">Wheeled Vehicle — 2 Axle (HMMWV, LMTV, M998, pickup)</option>
+              <option value="wheeled3">Wheeled Vehicle — 3 Axle (HEMTT, M977, M978, 5-ton)</option>
+              <option value="wheeled4">Wheeled Vehicle — 4 Axle (M1070 HET, heavy recovery)</option>
+              <option value="tracked">Tracked Vehicle (M1 Abrams, Bradley, M113, M88)</option>
+              <option value="trailer2">Trailer — 2 Axle</option>
+              <option value="trailer3">Trailer — 3 Axle / Semi-trailer</option>
+              <option value="skid">Skid-Mounted / General Cargo (10 ft+ or off-center CB)</option>
+            </select>
+          </div>
+          <div id="axle-inputs"></div>
+          <div id="skid-inputs" style="display:none">
+            <div class="info-box" style="margin-bottom:8px">Weigh forward and rear support points separately. Measure distance from front edge (RDL) to center of each support point.</div>
+            <div class="axle-row"><div class="axle-label">FORWARD SUPPORT POINT</div><div class="field-row"><div><div class="field-label">Weight (lbs)</div><input type="number" id="skid-fw" placeholder="lbs" inputmode="decimal"></div><div><div class="field-label">Dist from RDL (in)</div><input type="number" id="skid-fd" placeholder="inches" inputmode="decimal"></div></div></div>
+            <div class="axle-row"><div class="axle-label">AFT SUPPORT POINT</div><div class="field-row"><div><div class="field-label">Weight (lbs)</div><input type="number" id="skid-rw" placeholder="lbs" inputmode="decimal"></div><div><div class="field-label">Dist from RDL (in)</div><input type="number" id="skid-rd" placeholder="inches" inputmode="decimal"></div></div></div>
+          </div>
+          <hr class="divider">
+          <div class="field-row">
+            <div><div class="field-label">Total Length (in) <span style="color:var(--blue);font-size:9px">optional</span></div><input type="number" id="cob-total-len" placeholder="bumper to bumper" inputmode="decimal"></div>
+            <div><div class="field-label">Item Description <span style="color:var(--blue);font-size:9px">optional</span></div><input type="text" id="cob-item-desc" placeholder="e.g. HMMWV w/gun"></div>
+          </div>
+          <button class="btn" onclick="calcCoB()">CALCULATE CoB</button>
+          <button class="btn secondary" onclick="resetCoB()">↺ RESET</button>
+          <div class="result-box hidden" id="cob-result"><div class="result-label">Center of Balance</div><div class="result-value" id="cob-value">—</div><div class="result-sub" id="cob-detail"></div></div>
+          <div class="info-box" id="cob-marking" style="display:none"><strong>Marking requirement (DTR App P):</strong> Mark both sides with masking tape in a "T". Write gross weight in the crossbar. Write "CB" in the vertical bar at the CB location. Use weather-resistant material. Trailers and prime movers marked separately even if connected.</div>
+        </div>
+      </div>
+      <!-- Pallet -->
+      <div id="calc-pallet" style="display:none">
+        <div class="calc-box">
+          <div class="calc-title">463L PALLET — WEIGHT & CUBE</div>
+          <div class="info-box"><strong>463L specs:</strong> 108"×88"×2¼" · Usable deck: 104"×84"<br>Empty pallet: <strong>290 lbs</strong> (355 lbs with cargo nets)<br>Max gross: <strong>10,000 lbs</strong> · Desired load: <strong>7,500 lbs</strong><br>Use two side nets when cargo weight exceeds 5,500 lbs.</div>
+          <div><div class="field-label">Net Configuration</div><select id="net-type"><option value="290">No nets — pallet only (290 lbs tare)</option><option value="355">With cargo nets (355 lbs tare)</option></select></div>
+          <div class="field-row"><div><div class="field-label">Length (in)</div><input type="number" id="p-len" placeholder="max 108" inputmode="decimal"></div><div><div class="field-label">Width (in)</div><input type="number" id="p-wid" placeholder="max 88" inputmode="decimal"></div></div>
+          <div class="field-row"><div><div class="field-label">Height (in)</div><input type="number" id="p-hgt" placeholder="max 96" inputmode="decimal"></div><div><div class="field-label">Cargo Weight (lbs)</div><input type="number" id="p-cwt" placeholder="cargo only" inputmode="decimal"></div></div>
+          <button class="btn" onclick="calcPallet()">CALCULATE</button>
+          <div class="result-box hidden" id="pallet-result">
+            <div class="result-grid"><div><div class="result-label">Volume (cu ft)</div><div class="result-value" id="p-vol" style="font-size:26px">—</div></div><div><div class="result-label">Density (lb/ft³)</div><div class="result-value" id="p-dens" style="font-size:26px">—</div></div></div>
+            <hr class="divider" style="margin:10px 0">
+            <div class="result-grid"><div><div class="result-label">Gross Wt (w/ pallet)</div><div id="p-gross" style="font-family:var(--display);font-size:22px;color:var(--text)">—</div></div><div><div class="result-label">Remaining Capacity</div><div id="p-remain" style="font-family:var(--display);font-size:22px">—</div></div></div>
+            <div id="p-status" style="font-family:var(--mono);font-size:10px;margin-top:8px;text-align:center"></div>
+          </div>
+        </div>
+      </div>
+      <!-- PAX -->
+      <div id="calc-pax" style="display:none">
+        <div class="calc-box">
+          <div class="calc-title">TROOP / PAX WEIGHT ESTIMATE</div>
+          <div class="info-box">Planning factors per DTR 4500.9-R Pt III and Army GTA 55-07-003.<br><strong>Use actual scale weights whenever available.</strong><br>These are planning factors only — not for W&amp;B certification.</div>
+          <div><div class="field-label">Weight Category</div><select id="pax-cat"><option value="230">Summer PAX — 230 lbs (May–Oct, w/ carry-on baggage)</option><option value="250">Winter PAX — 250 lbs (Nov–Apr, w/ carry-on baggage)</option><option value="210">Cat 1 Troop — 210 lbs (LBE, weapon, helmet only)</option><option value="300">Cat 2 Troop — 300 lbs (Cat 1 + rucksack + org equipment)</option><option value="400">Cat 3 Troop — 400 lbs (Cat 2 + duffel bag, full combat load)</option><option value="180">KC-10 PAX — 180 lbs (KC-10 specific planning factor)</option></select></div>
+          <div><div class="field-label">Number of Troops / PAX</div><input type="number" id="pax-count" placeholder="e.g. 24" inputmode="decimal"></div>
+          <button class="btn" onclick="calcPax()">CALCULATE</button>
+          <div class="result-box hidden" id="pax-result"><div class="result-label">Estimated Total Weight</div><div class="result-value" id="pax-value">—</div><div class="result-sub" id="pax-detail"></div></div>
+          <div class="info-box"><strong>Cat 1/2/3</strong> = deployment troop categories.<br><strong>Summer/Winter</strong> = standard AMC passenger factors.<br>Always annotate which category was used on manifest notes.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECKLISTS -->
+    <div class="screen" id="screen-checklist">
+      <div class="back-btn" onclick="showScreen('home')">← BACK</div>
+      <div class="section-header">CHECKLISTS</div>
+      <div class="cl-tab-row" id="cl-tabs"></div>
+      <div class="progress-bar"><div class="progress-fill" id="cl-prog" style="width:0%"></div></div>
+      <div class="progress-label" id="cl-label">0 / 0</div>
+      <div class="checklist" id="cl-list"></div>
+      <button class="reset-btn" onclick="resetCurrentChecklist()">↺ RESET CHECKLIST</button>
+    </div>
+
+    <!-- GUIDES -->
+    <div class="screen" id="screen-guides">
+      <div class="back-btn" id="guides-back" onclick="guidesBack()">← BACK</div>
+      <div class="section-header" id="guides-hdr">SECTION GUIDES</div>
+      <div id="guides-nav-view"></div>
+      <div id="guides-detail-view" style="display:none"></div>
+    </div>
+
+    <!-- PUBS -->
+    <div class="screen" id="screen-pubs">
+      <div class="back-btn" onclick="showScreen('home')">← BACK</div>
+      <div class="section-header">PUBLICATIONS LIBRARY</div>
+      <div id="pubs-content"></div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="screen" id="screen-quiz">
+      <div class="back-btn" onclick="showScreen('home')">← BACK</div>
+      <div class="section-header">PRACTICE MODE</div>
+      <div class="quiz-bank-tabs" id="quiz-bank-tabs"></div>
+      <div id="quiz-container"></div>
+    </div>
+
+  </div>
+  <div class="navbar">
+    <div class="nav-item active" id="nav-home" onclick="showScreen('home')"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></div>
+    <div class="nav-item" id="nav-calc" onclick="showScreen('calc')"><span class="nav-icon">⚖️</span><span class="nav-label">Calc</span></div>
+    <div class="nav-item" id="nav-checklist" onclick="showScreen('checklist')"><span class="nav-icon">✅</span><span class="nav-label">Check</span></div>
+    <div class="nav-item" id="nav-pubs" onclick="showScreen('pubs')"><span class="nav-icon">📚</span><span class="nav-label">Pubs</span></div>
+    <div class="nav-item" id="nav-quiz" onclick="showScreen('quiz')"><span class="nav-icon">🎯</span><span class="nav-label">Quiz</span></div>
+  </div>
+</div>
+
+<script>
+// ONLINE BADGE
+function updateBadge(){document.getElementById('online-badge').textContent=navigator.onLine?'ONLINE':'OFFLINE';}
+window.addEventListener('online',updateBadge);window.addEventListener('offline',updateBadge);updateBadge();
+
+// SERVICE WORKER
+if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').then(r=>console.log('[SW]',r.scope)).catch(e=>console.log('[SW] fail',e));});}
+
+// NAV
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const nav=document.getElementById('nav-'+id);if(nav)nav.classList.add('active');
+  if(id==='guides')resetGuidesView();
+  if(id==='quiz')initQuizBanks();
+  if(id==='pubs')renderPubs();
+  if(id==='checklist')initChecklists();
+}
+
+// CALC TABS
+function switchCalc(id){
+  ['cob','pallet','pax'].forEach(t=>{document.getElementById('calc-'+t).style.display=t===id?'block':'none';});
+  document.querySelectorAll('.calc-tab').forEach((el,i)=>{el.classList.toggle('active',['cob','pallet','pax'][i]===id);});
+}
+
+// COB — axle configs
+// ADD CARGO TYPE: add key here + <option> in HTML above
+const AXLE_CONFIGS={
+  wheeled2:{axles:2,labels:['FRONT AXLE','REAR AXLE'],note:'2-axle wheeled vehicle. Examples: HMMWV, LMTV, M998, M1025, pickup trucks.'},
+  wheeled3:{axles:3,labels:['FRONT AXLE','CENTER AXLE','REAR AXLE'],note:'3-axle wheeled vehicle. Examples: HEMTT, M977, M978, M984, 5-ton cargo trucks.'},
+  wheeled4:{axles:4,labels:['STEER AXLE','DRIVE AXLE 1','DRIVE AXLE 2','REAR TAG AXLE'],note:'4-axle heavy vehicle. Examples: M1070 HET, M984A4 HEMTT Wrecker, large cranes.'},
+  tracked:{axles:2,labels:['FRONT (IDLER END)','REAR (DRIVE SPROCKET END)'],note:'Tracked vehicle: weigh front and rear ends on scales separately. Examples: M1 Abrams, M2/M3 Bradley, M113, M88 Recovery Vehicle.'},
+  trailer2:{axles:2,labels:['FRONT AXLE (or tongue weight)','REAR AXLE'],note:'2-axle trailer. If measuring with lunette attached, capture tongue weight at that point.'},
+  trailer3:{axles:3,labels:['FRONT AXLE','CENTER AXLE','REAR AXLE'],note:'3-axle trailer or semi-trailer. Measure from front edge (lunette/kingpin) to center of each axle group.'},
+  skid:null,
+};
+
+function updateCargoType(){
+  const type=document.getElementById('cargo-type').value;
+  const isSkid=type==='skid';
+  document.getElementById('skid-inputs').style.display=isSkid?'block':'none';
+  document.getElementById('axle-inputs').style.display=isSkid?'none':'block';
+  if(!isSkid)renderAxleInputs(AXLE_CONFIGS[type]);
+  document.getElementById('cob-result').classList.add('hidden');
+  document.getElementById('cob-marking').style.display='none';
+}
+
+function renderAxleInputs(config){
+  let html=`<div class="info-box" style="margin-bottom:8px">${config.note}<br><strong>RDL = front edge of vehicle.</strong> Measure from RDL to center of each axle.</div>`;
+  for(let i=0;i<config.axles;i++){
+    html+=`<div class="axle-row"><div class="axle-label">${config.labels[i]}</div><div class="field-row"><div><div class="field-label">Axle Weight (lbs)</div><input type="number" id="aw-${i}" placeholder="lbs" inputmode="decimal"></div><div><div class="field-label">Dist from RDL (in)</div><input type="number" id="ad-${i}" placeholder="inches" inputmode="decimal"></div></div></div>`;
+  }
+  document.getElementById('axle-inputs').innerHTML=html;
+}
+
+function calcCoB(){
+  const type=document.getElementById('cargo-type').value;
+  let moment=0,weight=0;
+  if(type==='skid'){
+    const fw=+document.getElementById('skid-fw').value,fd=+document.getElementById('skid-fd').value;
+    const rw=+document.getElementById('skid-rw').value,rd=+document.getElementById('skid-rd').value;
+    if(!fw||!fd||!rw||!rd){alert('Enter all support point weights and distances.');return;}
+    moment=fw*fd+rw*rd;weight=fw+rw;
+  } else {
+    const c=AXLE_CONFIGS[type];
+    for(let i=0;i<c.axles;i++){
+      const w=+document.getElementById('aw-'+i).value,d=+document.getElementById('ad-'+i).value;
+      if(!w||!d){alert('Enter weight and distance for all axles.');return;}
+      moment+=w*d;weight+=w;
+    }
+  }
+  const cb=Math.round(moment/weight);
+  const len=+document.getElementById('cob-total-len').value;
+  const desc=document.getElementById('cob-item-desc').value;
+  document.getElementById('cob-value').textContent=cb+'"';
+  let detail=`CB is ${cb}" aft of RDL (front edge)\nGross Weight: ${weight.toLocaleString()} lbs`;
+  if(desc)detail+=`\nItem: ${desc}`;
+  if(len)detail+=`\n${((cb/len)*100).toFixed(1)}% of total length (${len}")`;
+  detail+='\nRef: DTR 4500.9-R App P';
+  document.getElementById('cob-detail').textContent=detail;
+  document.getElementById('cob-result').classList.remove('hidden');
+  document.getElementById('cob-marking').style.display='block';
+}
+
+function resetCoB(){
+  document.getElementById('cob-result').classList.add('hidden');
+  document.getElementById('cob-marking').style.display='none';
+  document.getElementById('cob-item-desc').value='';
+  document.getElementById('cob-total-len').value='';
+  updateCargoType();
+}
+
+// PALLET CALC
+function calcPallet(){
+  const l=+document.getElementById('p-len').value,w=+document.getElementById('p-wid').value,h=+document.getElementById('p-hgt').value;
+  const cw=+document.getElementById('p-cwt').value,tare=+document.getElementById('net-type').value;
+  if(!l||!w||!h){alert('Enter dimensions.');return;}
+  const vol=(l*w*h)/1728,gross=cw?cw+tare:null,remain=cw?10000-(cw+tare):null;
+  document.getElementById('p-vol').textContent=vol.toFixed(1);
+  document.getElementById('p-dens').textContent=cw?(cw/vol).toFixed(1):'—';
+  document.getElementById('p-gross').textContent=gross?gross.toLocaleString()+' lbs':'—';
+  const re=document.getElementById('p-remain'),st=document.getElementById('p-status');
+  if(remain!==null){
+    re.textContent=remain.toLocaleString()+' lbs';
+    if(remain<0){re.style.color='var(--red)';st.style.color='var(--red)';st.textContent='⚠️ OVERWEIGHT — exceeds 10,000 lb max gross. Do not load.';}
+    else if(cw>5500){re.style.color='var(--amber)';st.style.color='var(--amber)';st.textContent='⚠️ Cargo >5,500 lbs — use two side nets per AFPAM 10-1403.';}
+    else{re.style.color='var(--green)';st.style.color='var(--green)';st.textContent='✅ Within limits.';}
+  } else {re.textContent='—';st.textContent='';}
+  let warn='';
+  if(l>108)warn+='⚠️ Length >108" pallet max  ';
+  if(w>88)warn+='⚠️ Width >88" pallet max  ';
+  if(h>96)warn+='⚠️ Height >96" std max';
+  if(warn){st.textContent+='  '+warn;st.style.color='var(--red)';}
+  document.getElementById('pallet-result').classList.remove('hidden');
+}
+
+// PAX CALC
+function calcPax(){
+  const n=+document.getElementById('pax-count').value,wt=+document.getElementById('pax-cat').value;
+  const sel=document.getElementById('pax-cat');
+  if(!n){alert('Enter number of troops/pax.');return;}
+  document.getElementById('pax-value').textContent=(n*wt).toLocaleString()+' lbs';
+  document.getElementById('pax-detail').textContent=`${n} personnel × ${wt} lbs = ${(n*wt).toLocaleString()} lbs\nCategory: ${sel.options[sel.selectedIndex].text}\nActual weighed values always preferred.`;
+  document.getElementById('pax-result').classList.remove('hidden');
+}
+
+// ── CHECKLISTS ──────────────────────────────────────────────────────
+// ADD CHECKLIST: add new key + items array here
+// ADD ITEM: add {cat, text, ref} to an items array
+const CHECKLISTS={
+  ji:{label:'JI Pre-Check',items:[
+    {cat:'DOCUMENTATION',text:'DD Form 2133 (Joint Airlift Inspection Record) ready — both inspector and unit rep sign upon completion',ref:'DAFI 24-602V2'},
+    {cat:'DOCUMENTATION',text:'DD Form 1387 (Military Shipment Label) complete, legible, and matches cargo',ref:'DAFI 24-602V2'},
+    {cat:'DOCUMENTATION',text:'DD Form 1387-2 attached if item requires special handling data',ref:'DAFI 24-602V2'},
+    {cat:'DOCUMENTATION',text:"Shipper's Declaration for DG completed and signed by a certified certifying official",ref:'AFMAN 24-604 / Att 25'},
+    {cat:'DOCUMENTATION',text:'Manifest matches physical cargo — count, weight, and cube all verified',ref:'DTR 4500.9-R Pt III'},
+    {cat:'PHYSICAL',text:'Packaging serviceable — no tears, punctures, crushed corners, or water damage',ref:'DAFI 24-602V2'},
+    {cat:'PHYSICAL',text:'No evidence of leakage, odor, staining, or contamination',ref:'AFMAN 24-604'},
+    {cat:'PHYSICAL',text:'Net explosive weight (NEW) verified for all Class 1 ammunition — marked on exterior',ref:'AFMAN 24-604'},
+    {cat:'PHYSICAL',text:'Oversize / overweight requirements identified and documented',ref:'DAFI 24-602V2'},
+    {cat:'PHYSICAL',text:'Blocking, bracing, and cushioning adequate for air movement',ref:'AFPAM 10-1403'},
+    {cat:'PHYSICAL',text:'Vehicles/equipment: CB marked on both sides — "T" mark with gross weight and CB in inches from RDL',ref:'DTR 4500.9-R App P'},
+    {cat:'SAFETY',text:'PPE on and serviceable before inspection begins',ref:'DAFI 24-602V2'},
+    {cat:'SAFETY',text:'HAZMAT placards and labels match the Shipper\'s Declaration exactly — class, UN number, quantity',ref:'AFMAN 24-604 Att 14-16'},
+    {cat:'SAFETY',text:'Co-load compatibility confirmed using AFMAN 24-604 Attachment 18 compatibility chart',ref:'AFMAN 24-604 Att 18'},
+    {cat:'SAFETY',text:'Unit rep is physically present throughout — JI cannot proceed or be signed without them',ref:'DAFI 24-602V2'},
+    {cat:'CERTIFICATION',text:'All discrepancies documented in writing and unit notified before acceptance decision',ref:'DAFI 24-602V2'},
+    {cat:'CERTIFICATION',text:'Inspector and unit rep both sign DD Form 2133 — inspector signs only after full inspection',ref:'DAFI 24-602V2'},
+  ]},
+  cargo:{label:'Cargo Acceptance',items:[
+    {cat:'RECEIPT',text:'Shipping documentation reviewed before cargo is off-loaded',ref:'DAFI 24-602V2'},
+    {cat:'RECEIPT',text:'Weight verified on calibrated scales — do not accept unit-provided weight as sole source',ref:'DAFI 24-602V2'},
+    {cat:'RECEIPT',text:'Dimensions measured and recorded — L×W×H for cube and load planning',ref:'DAFI 24-602V2'},
+    {cat:'HAZMAT',text:'HAZMAT screening performed — odors, residue, leaks, suspicious labels are red flags',ref:'AFMAN 24-604'},
+    {cat:'HAZMAT',text:'Correct labels and placards present and match declaration',ref:'AFMAN 24-604 Att 14-16'},
+    {cat:'HAZMAT',text:'Shipper\'s Declaration signed by a certified certifying official — verify authorization',ref:'AFMAN 24-604 Att 25'},
+    {cat:'HAZMAT',text:'Co-load compatibility with other staged cargo confirmed per Att 18',ref:'AFMAN 24-604 Att 18'},
+    {cat:'PALLET BUILD',text:'463L pallet — footprint 108"×88", usable deck 104"×84"',ref:'DAFI 24-602V2'},
+    {cat:'PALLET BUILD',text:'Gross weight does not exceed 10,000 lbs per pallet (including 290 lb pallet tare)',ref:'DAFI 24-602V2'},
+    {cat:'PALLET BUILD',text:'Two side nets used if cargo exceeds 5,500 lbs',ref:'AFPAM 10-1403'},
+    {cat:'PALLET BUILD',text:'Tie-down rings serviceable — not bent, missing, or cracked',ref:'AFPAM 10-1403'},
+    {cat:'PALLET BUILD',text:'Cargo built pyramid or square — heavy items centered and low',ref:'AFPAM 10-1403'},
+    {cat:'STAGING',text:'HAZMAT staged in designated area — segregated from incompatible classes',ref:'DAFI 24-602V2'},
+    {cat:'STAGING',text:'Priority and special handling cargo identified, flagged, and tracked',ref:'DAFI 24-602V2'},
+  ]},
+  ramp:{label:'Ramp Safety',items:[
+    {cat:'PRE-OPS',text:'FOD walk of aircraft interior and ramp area complete before any loading',ref:'DAFI 24-602V2'},
+    {cat:'PRE-OPS',text:'All MHE operators current and certified on equipment being operated',ref:'DAFI 24-602V2'},
+    {cat:'PRE-OPS',text:'Load plan received, reviewed, and understood',ref:'DAFI 24-602V2'},
+    {cat:'PRE-OPS',text:'Aircraft grounded and chocked — confirmed with aircrew before approach',ref:'DAFI 24-602V2'},
+    {cat:'PRE-OPS',text:'Shoring requirements identified for wheeled/tracked vehicles before rolling onto ramp',ref:'AFPAM 10-1403'},
+    {cat:'SAFETY',text:'3 points of contact on all ladders and aircraft entry/exit',ref:'DAFI 24-602V2'},
+    {cat:'SAFETY',text:'Spotter positioned for all blind K-loader and MHE movements',ref:'DAFI 24-602V2'},
+    {cat:'SAFETY',text:'PPE on: reflective belt, eye pro, hearing pro in jet blast / engine noise areas',ref:'DAFI 24-602V2'},
+    {cat:'SAFETY',text:'Non-essential personnel cleared from hazard zone during engine-running ops',ref:'DAFI 24-602V2'},
+    {cat:'LOADING',text:'Cargo loaded in sequence per load plan — deviations require load planner coordination',ref:'AFPAM 10-1403'},
+    {cat:'LOADING',text:'Minimum 4 tie-down chains per pallet at correct angles — no slack, no crossed chains',ref:'AFPAM 10-1403'},
+    {cat:'LOADING',text:'Floor load limits verified — heavy vehicles require shoring if limits exceeded',ref:'Aircraft TCO / AFPAM 10-1403'},
+    {cat:'LOADING',text:'HAZMAT positioned per AFMAN 24-604 — not adjacent to exits or passenger areas',ref:'AFMAN 24-604'},
+    {cat:'POST-LOAD',text:'All chains taut and secured — no loose ends',ref:'AFPAM 10-1403'},
+    {cat:'POST-LOAD',text:'Aircraft cleanliness check — no tools, rags, dunnage, or FOD left aboard',ref:'DAFI 24-602V2'},
+    {cat:'POST-LOAD',text:'Load plan changes communicated to load planning before aircraft release',ref:'DAFI 24-602V2'},
+  ]},
+  pax:{label:'PAX Processing',items:[
+    {cat:'CHECK-IN',text:'Travel orders current, complete, and properly signed — expired orders = no boarding',ref:'DTR 4500.9-R Pt I'},
+    {cat:'CHECK-IN',text:'Military ID verified and matches travel orders',ref:'DTR 4500.9-R Pt I'},
+    {cat:'CHECK-IN',text:'Baggage weighed on calibrated scales — actual weights recorded for W&B',ref:'DTR 4500.9-R Pt I'},
+    {cat:'CHECK-IN',text:'Baggage screened for prohibited items: loose lithium batteries, undeclared weapons, HAZMAT',ref:'AFMAN 24-604 / DTR Pt I'},
+    {cat:'CHECK-IN',text:'Space-A category verified — priority order enforced, no exceptions without supervisor',ref:'DTR 4500.9-R Pt I'},
+    {cat:'MANIFEST',text:'GATES manifest (channel) or DD Form 2130 (organic/SAAM) completed with accurate weights',ref:'DTR 4500.9-R Pt I'},
+    {cat:'MANIFEST',text:'Total pax count and total weight provided to load planning',ref:'DTR 4500.9-R Pt I'},
+    {cat:'MANIFEST',text:'Pax count does not exceed aircrew-authorized number',ref:'DTR 4500.9-R Pt I'},
+    {cat:'BRIEFING',text:'Safety briefing conducted before boarding: emergency procedures, prohibited items, seatbelt use',ref:'DTR 4500.9-R Pt I'},
+    {cat:'BRIEFING',text:'Classified material briefing given if required — no classified in cargo hold without escort',ref:'DTR 4500.9-R Pt I'},
+    {cat:'BOARDING',text:'Roll call performed — all manifested pax accounted for before boarding',ref:'DTR 4500.9-R Pt I'},
+    {cat:'BOARDING',text:'No-shows removed from manifest before aircraft release',ref:'DTR 4500.9-R Pt I'},
+  ]},
+};
+let activeChecklist='ji';
+let checkStates={};
+Object.keys(CHECKLISTS).forEach(k=>{checkStates[k]=CHECKLISTS[k].items.map(()=>false);});
+
+function initChecklists(){
+  const tabsEl=document.getElementById('cl-tabs');tabsEl.innerHTML='';
+  Object.keys(CHECKLISTS).forEach(k=>{
+    const t=document.createElement('div');t.className='cl-tab'+(k===activeChecklist?' active':'');t.textContent=CHECKLISTS[k].label;
+    t.onclick=()=>{activeChecklist=k;initChecklists();};tabsEl.appendChild(t);
+  });renderChecklist();
+}
+function renderChecklist(){
+  const data=CHECKLISTS[activeChecklist],state=checkStates[activeChecklist];
+  const list=document.getElementById('cl-list');list.innerHTML='';let lastCat=null;
+  data.items.forEach((item,i)=>{
+    if(item.cat!==lastCat){const c=document.createElement('div');c.className='check-cat';c.textContent=item.cat;list.appendChild(c);lastCat=item.cat;}
+    const el=document.createElement('div');el.className='check-item'+(state[i]?' done':'');
+    el.innerHTML=`<div class="check-box"><svg width="12" height="10" viewBox="0 0 12 10"><polyline points="1,5 4,8 11,1" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg></div><div><div class="check-text">${item.text}</div><div class="check-ref">Ref: ${item.ref}</div></div>`;
+    el.onclick=()=>{checkStates[activeChecklist][i]=!checkStates[activeChecklist][i];renderChecklist();};list.appendChild(el);
+  });
+  const done=state.filter(Boolean).length,total=data.items.length;
+  document.getElementById('cl-prog').style.width=(done/total*100)+'%';
+  document.getElementById('cl-label').textContent=`${done} / ${total} complete`;
+}
+function resetCurrentChecklist(){checkStates[activeChecklist]=CHECKLISTS[activeChecklist].items.map(()=>false);renderChecklist();}
+
+// ── SECTION GUIDES ───────────────────────────────────────────────────
+// ADD GUIDE: add new object to this array
+const GUIDES=[
+  {id:'cargo',icon:'📦',name:'Cargo Processing',reg:'DAFI 24-602V2',
+    what:'Entry point for all freight entering the aerial port. Receives, inspects, weighs, documents, and stages cargo for air movement. Everything flows through here before JI.',
+    tasks:['Review shipping documentation before off-loading from unit vehicles','Verify weight on calibrated scales — never accept unit-provided weight as sole source','Measure and record L×W×H for cube and load planning','Screen for undeclared HAZMAT: fuel smells, oily residue, suspicious labels are red flags','Verify CB marking on vehicles — "T" mark with gross weight and inches aft of RDL','Build 463L pallets pyramid/square, heavy items centered and low','Apply two side nets when cargo exceeds 5,500 lbs','Stage HAZMAT in designated area, segregated from incompatible classes','Document all discrepancies in writing — notify unit before accepting or rejecting'],
+    mistakes:['Accepting packaging that fails to avoid conflict with the unit','Missing undeclared HAZMAT — fuel smell and oily residue are Class 3 indicators','Trusting unit-provided weights — 1,000+ lb discrepancies are common and dangerous','Missing or incorrect CB marking on vehicles — JI rejection item','Skipping net upgrade when cargo exceeds 5,500 lbs'],
+    ref:'DAFI 24-602V2 (primary) · AFMAN 24-604 · DTR 4500.9-R Pt III App H\nKey forms: DD 1387, DD 1387-2, DD 2133, Shipper\'s Declaration for DG\n463L max gross: 10,000 lbs · Pallet tare: 290 lbs (355 w/ nets) · Desired load: 7,500 lbs'},
+  {id:'ji',icon:'🔍',name:'Joint Inspection',reg:'DAFI 24-602V2',
+    what:'Formal acceptance checkpoint between the shipping unit and the aerial port. Certified 2T2 inspector and unit rep jointly verify cargo is safe, documented, and ready for air movement. Both must be present — no exceptions.',
+    tasks:['Confirm unit rep is on site before starting — they must stay for the full inspection','Verify DD Form 1387 matches cargo in every field','DD Form 2133 (Joint Airlift Inspection Record) is what both parties sign at completion','Physically inspect packaging condition: tears, leaks, staining, odors','Confirm HAZMAT placards and labels match the Shipper\'s Declaration exactly','Verify CB marking on vehicles and equipment per DTR App P','Check co-load compatibility using AFMAN 24-604 Attachment 18','Document all discrepancies in writing before making acceptance decision','Sign DD Form 2133 only after full inspection is complete — both parties sign'],
+    mistakes:['Signing DD 2133 without unit rep physically present — voids the JI','Accepting documentation that doesn\'t match the cargo','Not catching underdeclared HAZMAT — your signature means you accepted it','Rushing JI under time pressure — an incomplete JI is the same as no JI','Not documenting rejections in writing — verbal only is not sufficient','Forgetting CB marking check on vehicles — common miss under pressure'],
+    ref:'DAFI 24-602V2 · AFMAN 24-604 Att 25 (certifying officials)\nKey form: DD Form 2133 (Joint Airlift Inspection Record)\nRequired for ALL military cargo entering the airlift system\nHAZMAT cargo requires HAZMAT-certified inspector signature'},
+  {id:'loadplan',icon:'✈️',name:'Load Planning',reg:'AFPAM 10-1403',
+    what:'Determines how cargo is positioned on the aircraft to maintain safe weight and balance. Produces the Air Cargo Manifest (ACM), calculates CB, coordinates with aircrew, and briefs ramp crews before every mission.',
+    tasks:['Calculate aircraft CB and verify within limits for specific airframe and configuration','Build and publish the Air Cargo Manifest (ACM) with accurate weights and positions','Coordinate with aircrew on weight restrictions, floor limits, and special cargo','Verify HAZMAT placement meets AFMAN 24-604 requirements','Determine required restraint for each position — pallet vs. vehicle vs. loose cargo','Update manifest immediately for any cargo changes — do not release stale data','Brief ramp crew on heavy, outsized, or sensitive loads before loading begins','Verify floor load limits from aircraft TCO, not memory'],
+    mistakes:['Incorrect CB calculation — verify the math, have someone check it','Not updating manifest before departure after a cargo change','Ignoring HAZMAT placement rules — proximity to exits and passengers matters','Not briefing ramp crew on heavy loads — causes injuries and aircraft damage','Relying on memory for floor load limits instead of the aircraft TCO'],
+    ref:'AFPAM 10-1403 (C-17, C-130, C-5, KC-10 planning data)\nAlways pull actual limits from AFPAM 10-1403 — do not guess or use memory\nCoordinate aircraft-specific limits with aircrew and TCO'},
+  {id:'ramp',icon:'🛬',name:'Ramp Services',reg:'DAFI 24-602V2 / AFPAM 10-1403',
+    what:'Physically loads and offloads aircraft, operates MHE, drives the K-loader, and ensures all cargo is properly restrained. Ramp owns ground time and is the last hands on cargo before the jet closes.',
+    tasks:['FOD walk — every load operation, no exceptions, even if nothing changed','Marshal aircraft to parking spot safely','Operate K-loader and MHE per your current certifications only','Load in the sequence shown on the load plan — do not improvise','Minimum 4 tie-down chains per pallet at correct angles — check angles and tension','Identify shoring requirements for wheeled and tracked vehicles before rolling onto ramp','Post-load cleanliness check: tools, rags, dunnage, broken chain links — nothing stays on the jet','Report cargo changes to load planning before aircraft release'],
+    mistakes:['Skipping the FOD walk — one bolt ingested by an engine ends the mission and careers','Operating MHE without current certification','Wrong tie-down angles or slack chains','Rolling vehicles onto ramp without verifying shoring requirements','Not telling load planning about cargo changes — manifest must match what\'s on the jet'],
+    ref:'AFPAM 10-1403 · DAFI 24-602V2\nMin 4 chains per pallet · No more than 50% of restraint on vehicle axles\nFOD walk before every load operation — no exceptions\n3 points of contact on all aircraft entry/exit'},
+  {id:'pax',icon:'👥',name:'Passenger Service',reg:'DTR 4500.9-R Pt I / DAFI 24-602V1',
+    what:'Manages movement of military personnel through the aerial port — check-in through boarding. Every passenger on a DoD aircraft needs valid orders, verified ID, weighed baggage, and must be manifested. GATES is used for AMC channel flights.',
+    tasks:['Verify travel orders — current, complete, and properly signed','Verify military ID against orders — names must match','Weigh all baggage on calibrated scales — actual weights required for W&B','Screen for prohibited items: loose lithium batteries, undeclared weapons, HAZMAT','Check Space-A category and enforce priority order','Check in via GATES (channel flights) or complete DD Form 2130 (organic/SAAM)','Provide total pax count and total weight to load planning','Conduct safety and prohibited items briefing before boarding','Roll call — all manifested pax accounted for before boarding begins','Remove no-shows from manifest before releasing aircraft'],
+    mistakes:['Boarding pax on expired or incomplete orders','Not weighing baggage — estimating fails W&B accuracy','Skipping the prohibited items briefing — required, not optional','Boarding over the aircrew-authorized pax count','Leaving no-shows on the manifest at departure'],
+    ref:'DTR 4500.9-R Pt I (primary PAX authority) · DAFI 24-602V1 (AF procedures)\nPlanning weights: 230 lbs/pax May–Oct · 250 lbs/pax Nov–Apr · 180 lbs KC-10 specific\nActual weighed values always preferred — annotate source on manifest notes\nGATES = AMC channel PAX system · DD Form 2130 = cargo/organic aircraft manifest'},
+  {id:'atoc',icon:'🗼',name:'ATOC',reg:'AFI 24-605V2',
+    what:'Air Terminal Operations Center — command and control nerve center of the aerial port. Tracks all aircraft, coordinates with AMC/TACC, manages manifests in GATES and CMOS, and resolves issues in real time. AMS-TAC is the deployed equivalent.',
+    tasks:['Receive and process aircraft schedules from AMC 618th AOC (TACC) or unit ops','Coordinate with all work centers on each aircraft','Manage manifests: GATES for pax, CMOS for cargo, AMS-TAC for deployed ops','Track cargo and pax discrepancies — initiate TDRs when required','Brief incoming aircrew on load plans, special cargo, and any deviations','File TDRs for damaged or pilfered cargo within required timeframes','Monitor ground times and report delays','Thorough shift handoff — the next shift needs your full picture'],
+    mistakes:['Not pushing aircraft changes to work centers fast enough — everything downstream depends on ATOC','Failing to update GATES or CMOS before departure — stale data causes accountability failures','Missing TDR filing deadlines for damaged cargo — there are time limits','Poor shift handoff — gaps in continuity become ops problems'],
+    ref:'AFI 24-605V2 · DAFI 24-602V2\nKey systems: GATES (pax) · CMOS (cargo) · AMS-TAC (deployed)\nTDR required for all damaged, pilfered, or discrepant cargo\n618th AOC (TACC) = Air Mobility Command global control center'},
+];
+
+function renderGuideNav(){
+  const nav=document.getElementById('guides-nav-view');nav.innerHTML='';
+  GUIDES.forEach(g=>{
+    const el=document.createElement('div');el.className='guide-nav-item';
+    el.innerHTML=`<div class="guide-nav-left"><span class="guide-icon">${g.icon}</span><div><div class="guide-name">${g.name}</div><div class="guide-tasks">${g.reg}</div></div></div><span style="color:var(--muted);font-size:14px">›</span>`;
+    el.onclick=()=>showGuideDetail(g);nav.appendChild(el);
+  });
+}
+function showGuideDetail(g){
+  document.getElementById('guides-nav-view').style.display='none';
+  document.getElementById('guides-detail-view').style.display='block';
+  document.getElementById('guides-hdr').textContent=g.name.toUpperCase();
+  document.getElementById('guides-back').onclick=resetGuidesView;
+  document.getElementById('guides-detail-view').innerHTML=`
+    <div class="guide-block"><div class="guide-block-title">What This Section Does</div><p>${g.what}</p></div>
+    <div class="guide-block"><div class="guide-block-title">Key Tasks</div><ul>${g.tasks.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+    <div class="guide-block"><div class="guide-block-title">Common Mistakes</div>${g.mistakes.map(m=>`<div class="mistake-item"><div class="mistake-dot"></div><div class="mistake-text">${m}</div></div>`).join('')}</div>
+    <div class="guide-block"><div class="guide-block-title">Regulatory Reference</div><div class="reg-ref">${g.ref.replace(/\n/g,'<br>')}</div></div>`;
+}
+function resetGuidesView(){
+  document.getElementById('guides-nav-view').style.display='block';
+  document.getElementById('guides-detail-view').style.display='none';
+  document.getElementById('guides-hdr').textContent='SECTION GUIDES';
+  document.getElementById('guides-back').onclick=()=>showScreen('home');
+}
+function guidesBack(){
+  if(document.getElementById('guides-detail-view').style.display==='block'){resetGuidesView();}
+  else{showScreen('home');}
+}
+renderGuideNav();
+
+// ── PUBLICATIONS ─────────────────────────────────────────────────────
+// ADD PUB: add new object to correct category items array
+const PUBS=[
+  {cat:'CAREER FIELD DOCUMENTS',items:[
+    {id:'CFETP 2T2X1',full:'Career Field Education and Training Plan — Air Transportation',badge:'public',url:'https://static.e-publishing.af.mil/production/1/af_a4/publication/cfetp2t2x1/cfetp2t2x1.pdf',desc:'The 2T2 career document. Every task at every skill level. The STS is here — this is what you are trained and evaluated on. Updated March 2026.',covers:['Skill level requirements','STS task list','Core tasks','Career progression']},
+    {id:'DAFECD',full:'DAF Enlisted Classification Directory',badge:'public',url:'https://static.e-publishing.af.mil/production/1/af_a1/publication/afecd/afecd.pdf',desc:'Official AFSC description and qualification requirements for each skill level.',covers:['AFSC description','Qualification requirements']},
+  ]},
+  {cat:'AFI — CARGO & AERIAL PORT',items:[
+    {id:'DAFI 24-602V2',full:'Cargo Movement',badge:'public',url:'https://static.e-publishing.af.mil/production/1/af_a4/publication/dafi24-602v2/dafi24-602v2.pdf',desc:'Primary daily reference for cargo ops. JI (DD 2133), cargo processing, HAZMAT, documentation, accountability.',covers:['JI procedures (DD 2133)','Cargo processing','HAZMAT requirements','TDR filing']},
+    {id:'DAFI 24-602V1',full:'Passenger Movement',badge:'public',url:'https://static.e-publishing.af.mil/production/1/af_a4/publication/dafi24-602v1/afi24-602v1.pdf',desc:'Governs movement of military passengers on DoD and commercial aircraft.',covers:['Space-A procedures','Travel order requirements','Baggage rules','GATES check-in']},
+    {id:'AFI 24-605V1',full:'Air Transportation Organization and Structure',badge:'public',url:'https://static.e-publishing.af.mil/production/1/af_a4/publication/afi24-605v1/afi24-605v1.pdf',desc:'Defines how aerial port squadrons are organized and led.',covers:['Aerial port organization','AMC relationships']},
+    {id:'AFI 24-605V2',full:'Air Transportation Operations',badge:'public',url:'https://static.e-publishing.af.mil/production/1/af_a4/publication/afi24-605v2/afi24-605v2.pdf',desc:'Operational procedures for load planning, cargo handling, PAX movement, aerial delivery, ATOC.',covers:['Load planning ops','Cargo handling','Aerial delivery','ATOC / GATES / CMOS']},
+  ]},
+  {cat:'HAZARDOUS MATERIALS',items:[
+    {id:'AFMAN 24-604',full:'Preparing Hazardous Materials for Military Air Shipments',badge:'public',url:'https://static.e-publishing.af.mil/production/1/af_a4/publication/dafman24-604/dafman24-604.pdf',desc:'The HAZMAT bible. All 9 DG classes, packaging, labeling, placarding, compatibility, certification. Also TM 38-250 (Army) / NAVSUP PUB 505 (Navy).',covers:['9 DG classes','Packaging','Labeling & placarding (Att 14-16)','Compatibility (Att 18)','Certifying officials (Att 25)']},
+    {id:'AFMAN 91-201',full:'Explosives Safety Standards',badge:'public',url:'https://static.e-publishing.af.mil/production/1/afsec/publication/afman91-201/afman91-201.pdf',desc:'Safety standards for Class 1 explosives — handling, transport, storage, compatibility.',covers:['Explosives classifications','Safety distances','Handling rules']},
+  ]},
+  {cat:'DEFENSE TRANSPORTATION REGULATION',items:[
+    {id:'DTR 4500.9-R Pt I',full:'Passenger Movement',badge:'public',url:'https://www.ustranscom.mil/dtr/dtrp1.cfm',desc:'DoD-wide PAX movement authority. AFI 24-602V1 implements this.',covers:['PAX eligibility','Space-A categories','Travel orders','Baggage rules']},
+    {id:'DTR 4500.9-R Pt II',full:'Cargo Movement',badge:'public',url:'https://www.ustranscom.mil/dtr/dtrp2.cfm',desc:'DoD cargo documentation, shipping labels, and freight movement rules.',covers:['DD 1387 / 1387-2','Military Shipping Labels','Tracer actions']},
+    {id:'DTR 4500.9-R Pt III',full:'Mobility',badge:'public',url:'https://www.ustranscom.mil/dtr/part-iii/dtr_part_iii_toc.pdf',desc:'Deployment and contingency ops. APOE/APOD procedures, unit moves, CB determination.',covers:['Deployment planning','APOE/APOD','CB determination (App P)','Load planner cert (App B)','Aerial port procedures (App M)','HAZMAT mobility (App J)']},
+  ]},
+  {cat:'LOAD PLANNING & AIRCRAFT DATA',items:[
+    {id:'AFPAM 10-1403',full:'Air Mobility Planning Factors',badge:'public',url:'https://static.e-publishing.af.mil/production/1/amc/publication/afpam10-1403/afpam10-1403.pdf',desc:'Aircraft planning data for C-17, C-130, C-5, KC-10. Weight limits, pallet positions, floor load limits, tie-down requirements.',covers:['C-17 load data','C-130 series load data','C-5 load data','KC-10 load data','Floor load limits','Tie-down requirements']},
+  ]},
+  {cat:'PROMOTION & UPGRADE STUDY',items:[
+    {id:'2T251 CDC Vols 1-3',full:'Air Transportation Journeyman Career Development Course',badge:'restricted',url:'https://www.airuniversity.af.edu/AFCDA/',desc:'Official 5-level upgrade course. Required for upgrade. Access via ADLS with CAC/login.',covers:['Air freight procedures','JI operations','Load planning','PAX services','MHE & vehicles','Aerial delivery']},
+    {id:'WAPS SKT Refs',full:'Specialty Knowledge Test Reference List',badge:'public',url:'https://mypers.af.mil',desc:'Current SKT study references in the WAPS Catalog. Check MyPers or your UTM.',covers:['Study refs by grade','SKT schedule','WAPS catalog']},
+  ]},
+];
+function renderPubs(){
+  const el=document.getElementById('pubs-content');if(el.innerHTML!=='')return;
+  let html='';
+  PUBS.forEach(cat=>{
+    html+=`<div class="pub-category">${cat.cat}</div>`;
+    cat.items.forEach(p=>{
+      html+=`<div class="pub-card"><div class="pub-header"><div class="pub-name">${p.id}</div><div class="pub-badge ${p.badge}">${p.badge==='public'?'PUBLIC':'CAC REQUIRED'}</div></div><div class="pub-full-name">${p.full}</div><div class="pub-desc">${p.desc}</div><div class="pub-covers">${p.covers.map(t=>`<span class="pub-tag">${t}</span>`).join('')}</div><div class="pub-url">🔗 ${p.url}</div></div>`;
+    });
+  });
+  el.innerHTML=html;
+}
+
+// ── QUIZ BANKS ───────────────────────────────────────────────────────
+// ADD QUESTION: add new object to correct bank array
+// ADD BANK: add new key + array — tab auto-generates
+const QUIZ_BANKS={
+  'DAFI 24-602':[
+    {scenario:'A unit drops off a pallet labeled "vehicle parts." You notice oily residue on one box and a faint fuel smell.',q:'What is the correct action?',opts:['Accept — vehicle parts are common cargo','Reject — require proper HAZMAT declaration, packaging, and Shipper\'s Declaration signed by certified official','Accept with a note on the DD 1387','Open the box to confirm contents before deciding'],correct:1,feedback:'Correct. Per AFMAN 24-604, oily residue and fuel odor indicate undeclared Class 3 Flammable Liquid. Reject. Require proper declaration, packaging, and a certified official\'s signature on the Shipper\'s Declaration.',src:'AFMAN 24-604 / DAFI 24-602V2'},
+    {scenario:'During JI, the unit rep receives an urgent call and leaves before the inspection is complete.',q:'What is the correct action?',opts:['Finish and sign DD Form 2133 for both parties','Halt — JI requires both parties present throughout. Reschedule.','Have another 2T2 sign as the unit rep','Accept since the physical inspection looked fine'],correct:1,feedback:'Correct per DAFI 24-602V2: Both the inspector and unit rep must be present for the entire JI. If the unit rep leaves, the JI is void. Do not sign DD Form 2133. Reschedule.',src:'DAFI 24-602V2'},
+    {scenario:'The unit says cargo weighs 4,200 lbs. Your calibrated scale reads 5,600 lbs.',q:'Which weight goes on the manifest?',opts:['4,200 lbs — it\'s the official unit documentation','5,600 lbs — scale weight used, discrepancy documented and reported to load planning','Average both figures','5,600 lbs, but no need to notify load planning'],correct:1,feedback:'Correct per DAFI 24-602V2: Always use verified scale weight. A 1,400-lb discrepancy directly impacts W&B. Update the manifest, document the discrepancy, and notify load planning.',src:'DAFI 24-602V2'},
+    {scenario:'A Shipper\'s Declaration for DG is correctly filled out but signed by a sergeant who is not a certified HAZMAT certifying official.',q:'What action do you take?',opts:['Accept — the form is filled out correctly','Reject — only certified HAZMAT officials may sign the declaration','Accept if the unit officer co-signs','Ask your supervisor — this is a gray area'],correct:1,feedback:'Not a gray area. Per AFMAN 24-604 Attachment 25: Only personnel who have completed required HAZMAT certification training are authorized to certify the Shipper\'s Declaration. Reject and require a certified official.',src:'AFMAN 24-604 Att 25'},
+    {scenario:'Your supervisor says: "Don\'t bother weighing everything — just use the weight on the unit\'s paperwork, it\'s always close enough."',q:'Is this acceptable?',opts:['Yes — if the unit provides certified paperwork, their weight is official','No — DAFI 24-602V2 requires weight verification on calibrated scales. Unit paperwork alone is not sufficient.','Yes for cargo under 2,000 lbs','Only if the unit commander signs the manifest'],correct:1,feedback:'Not acceptable. DAFI 24-602V2 requires verification on calibrated scales. Significant discrepancies between stated and actual weight are common and directly affect W&B safety. Push back on this guidance.',src:'DAFI 24-602V2'},
+  ],
+  'AFMAN 24-604':[
+    {scenario:'A unit presents a 463L pallet with Class 1.4S small arms ammunition co-loaded with MREs.',q:'Is this permissible and under what conditions?',opts:['No — ammo and food can never be on the same pallet','Yes — Class 1.4S with MREs is authorized under specific AFMAN 24-604 conditions: max separation, HAZMAT not above MREs','Yes — Class 1.4S is so low-hazard it can go anywhere','Only if the aircraft commander approves in writing'],correct:1,feedback:'Per AFMAN 24-604 §3.6.3: MREs may be on the same 463L pallet as HAZMAT (excluding Class 2.3 toxic gases) if separated by maximum possible distance and HAZMAT not loaded above MREs. Authorized, but inspect the pallet build carefully.',src:'AFMAN 24-604 §3.6.3'},
+    {scenario:'Placards show Class 4.1 (Flammable Solid) but the Shipper\'s Declaration lists Class 4.2 (Spontaneously Combustible).',q:'What do you do?',opts:['Accept — both are Class 4 and handling is similar','Reject — hazard class on labels must exactly match the Shipper\'s Declaration and UN number','Accept with a note since both are low-hazard','Call the certifying official for verbal confirmation'],correct:1,feedback:'Correct per AFMAN 24-604: Class on labels and placards must exactly match the declaration. Class 4.1 and 4.2 are distinct hazards with different handling requirements. Reject and require correction.',src:'AFMAN 24-604 §1.2'},
+    {scenario:'A shipment contains Class 3 Flammable Liquid and Class 5.1 Oxidizer. The unit wants them on the same pallet.',q:'Is this permissible?',opts:['Yes — both are in approved packaging','No — Class 3 and Class 5.1 are incompatible per AFMAN 24-604 Attachment 18','Yes if separated by a physical barrier','Only the aircraft commander can authorize this'],correct:1,feedback:'Correct. AFMAN 24-604 Attachment 18 (compatibility chart): Class 3 and Class 5.1 are incompatible — oxidizers accelerate burning of flammable materials. Must not be co-loaded or placed adjacent.',src:'AFMAN 24-604 Att 18'},
+    {scenario:'Ammunition boxes show a NEW marking on the exterior, but you cannot reconcile it against the Shipper\'s Declaration.',q:'What is the correct action?',opts:['Accept — the marking is visible, that\'s sufficient','Halt — require the unit to reconcile the NEW on exterior marking with the Shipper\'s Declaration before acceptance','Accept and note "NEW unverified" on DD 2133','Weigh the boxes yourself to calculate NEW'],correct:1,feedback:'Correct per AFMAN 24-604 and DAFI 24-602V2: NEW must be verified and match between the physical marking and Shipper\'s Declaration. NEW drives separation distances, loading restrictions, and safety requirements. Do not accept until reconciled.',src:'AFMAN 24-604 / DAFI 24-602V2'},
+  ],
+  'DTR 4500.9-R':[
+    {scenario:'A military passenger presents travel orders with a report date of two days ago and no amendment or extension attached.',q:'What is the correct action?',opts:['Check them in — they may have been delayed and it\'s close enough','Deny boarding — expired orders are not valid authorization for air movement','Allow them on Space-A if seats are available','Contact their commander for verbal authorization'],correct:1,feedback:'Correct per DTR 4500.9-R Pt I: Passengers must have current, valid orders. Expired orders without amendment are not valid. Direct the passenger to their unit for updated orders.',src:'DTR 4500.9-R Pt I'},
+    {scenario:'24 soldiers are deploying in August with full combat loads — rucksacks, weapons, LBE, and duffel bags. Load planning asks for a planning weight.',q:'Which DTR weight category is most appropriate?',opts:['230 lbs each — standard summer PAX factor','400 lbs each — Category 3, full combat load including duffel bag','210 lbs each — Category 1, weapons and LBE only','300 lbs each — Category 2, rucksack and org equipment'],correct:1,feedback:'Correct per DTR 4500.9-R Pt III: Category 3 (400 lbs) covers full combat load: Cat 1 + rucksack + duffel bag. The 230 lb summer factor is for standard PAX with carry-on only. Use actual weights when scales are available.',src:'DTR 4500.9-R Pt III / Army GTA 55-07-003'},
+    {scenario:'An aircraft departs. An hour later you discover the manifest cargo weight is 2,200 lbs less than what is actually on the aircraft due to a scale error.',q:'What actions are required?',opts:['Update the manifest in CMOS and brief the next shift','Immediately notify load planning and destination aerial port (APOD) of actual weight — TDR may be required','Nothing — the aircraft departed safely so the discrepancy is moot','File a TDR when the aircraft lands at destination'],correct:1,feedback:'Correct per DAFI 24-602V2 / DTR Pt III: A 2,200-lb discrepancy on a departed aircraft requires immediate notification to destination and load planning. A TDR documents the event. Depending on the deviation, aircrew notification through ops may also be required.',src:'DAFI 24-602V2 / DTR 4500.9-R Pt III'},
+  ],
+  'AFPAM 10-1403':[
+    {scenario:'Your CB calculation for a C-17 mission puts the load at 38% MAC.',q:'What does this indicate and what should you do?',opts:['38% MAC is within normal limits — proceed','38% MAC is likely aft of normal C-17 operating range — verify against aircraft TCO and coordinate with aircrew before releasing','38% MAC means the load is too far forward — redistribute aft','CB percentage is not used for C-17 — only total weight matters'],correct:1,feedback:'A CB at 38% MAC is typically aft of the normal C-17 operating envelope (generally 25–35% MAC). Always verify against the specific aircraft TCO and current configuration — never rely on memory for CB limits. Coordinate with the aircrew.',src:'AFPAM 10-1403 / Aircraft TCO'},
+    {scenario:'After loading a C-130, you count 3 tie-down chains on a 463L pallet at position 3.',q:'Is this acceptable?',opts:['Yes — 3 chains is the minimum if tensioned correctly','No — minimum is 4 tie-down chains. This is a safety deficiency.','Depends on cargo weight — 3 may suffice for lighter loads','Yes if a cargo net is also installed'],correct:1,feedback:'Correct per AFPAM 10-1403: Minimum is 4 tie-down chains at correct angles. 3 chains is a safety deficiency. Stop, add the fourth chain, verify angles and tension on all 4, then release. Do not close the aircraft with a restraint deficiency.',src:'AFPAM 10-1403'},
+    {scenario:'You are preparing to load a 14,500-lb wheeled vehicle onto a C-130. The section chief says "just drive it on, we\'ve done it before."',q:'What must you verify before rolling the vehicle onto the ramp?',opts:['Nothing — if we\'ve done it before, it\'s fine','Floor load limits per aircraft TCO for the specific position, axle loads, and shoring requirements. Coordinate with load planning and aircrew.','Only that the vehicle has enough fuel to drive on','Just that total payload is under aircraft maximum'],correct:1,feedback:'Correct per AFPAM 10-1403: Each floor position has specific load limits in lbs per linear foot. Heavy vehicles may require shoring to distribute axle weight. The aircraft TCO is the authority — not past practice. Coordinate with load planning and aircrew.',src:'AFPAM 10-1403 / Aircraft TCO'},
+  ],
+  'CFETP / Career':[
+    {scenario:'A new 3-level says: "My supervisor told me I only need to pass the CDC test to get my 5-level."',q:'Is this correct?',opts:['Yes — the CDC test is the main requirement','No — 5-level requires CDCs AND qualifying on all 5-level core tasks in the STS AND meeting time-in-service requirements','Yes — CDCs are all that is required','No — the CDC is optional; only the task list matters'],correct:1,feedback:'Correct per CFETP 2T2X1: 5-level upgrade requires three things: (1) completion of 2T251 CDCs Vols 1-3 and passing end-of-course review, (2) task qualification and certification on all 5-level core tasks in the STS, (3) meeting minimum time-in-service/grade requirements per DAFECD.',src:'CFETP 2T2X1 / DAFECD'},
+    {scenario:'A supervisor tells the section: "Core tasks are just suggestions — I decide what tasks you qualify on based on what we actually do here."',q:'Is this guidance correct?',opts:['Yes — supervisors have authority to tailor training to their mission','No — core tasks are mandatory AFCFM-designated minimums for everyone in the AFSC regardless of duty position','Yes — local mission requirements can replace AFCFM core tasks','Partially — supervisors can waive up to 25% of core tasks'],correct:1,feedback:'Incorrect guidance per CFETP 2T2X1: Core tasks are minimum qualifications designated by the AFCFM — mandatory for everyone in the AFSC regardless of duty position. Supervisors may add local tasks but cannot remove or waive AFCFM core tasks without going through the AFCFM.',src:'CFETP 2T2X1'},
+    {scenario:'A reservist cross-trainee has been doing cargo processing for 6 months but has never worked PAX service or load planning. The supervisor says that\'s fine because "we\'re a cargo unit."',q:'Is this correct from a CFETP standpoint?',opts:['Yes — units can focus training on their primary mission','No — core tasks span the entire AFSC. If PAX or load planning are core tasks, they must be trained regardless of unit focus.','Yes — reservists have modified requirements that allow mission-specific focus','Only if the member\'s deployment UTC requires cargo skills only'],correct:1,feedback:'Per CFETP 2T2X1: Core tasks are mandatory regardless of unit mission focus. If PAX service or load planning tasks are identified as 5-level core tasks, the member must be trained and certified. Coordinate cross-training opportunities if needed.',src:'CFETP 2T2X1'},
+  ],
+};
+
+let activeBankKey=Object.keys(QUIZ_BANKS)[0];
+let bankIdx=0,bankScore=0,bankAnswered=false;
+
+function initQuizBanks(){
+  const tabs=document.getElementById('quiz-bank-tabs');tabs.innerHTML='';
+  Object.keys(QUIZ_BANKS).forEach(k=>{
+    const t=document.createElement('div');t.className='quiz-bank-tab'+(k===activeBankKey?' active':'');t.textContent=k;
+    t.onclick=()=>{activeBankKey=k;bankIdx=0;bankScore=0;bankAnswered=false;initQuizBanks();};tabs.appendChild(t);
+  });renderBankQuestion();
+}
+function renderBankQuestion(){
+  const c=document.getElementById('quiz-container');
+  const bank=QUIZ_BANKS[activeBankKey];
+  if(bankIdx>=bank.length){
+    const pct=Math.round(bankScore/bank.length*100);
+    c.innerHTML=`<div class="score-display"><div class="score-big">${pct}%</div><div class="score-label">${bankScore}/${bank.length} correct — ${activeBankKey}</div><div style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--muted)">${pct>=80?'✅ SOLID — keep it up':pct>=60?'⚠️ REVIEW weak areas':'🔁 RETRY recommended'}</div><button class="btn" style="margin-top:20px;max-width:200px" onclick="bankIdx=0;bankScore=0;renderBankQuestion()">RETRY BANK</button></div>`;
+    return;
+  }
+  const q=bank[bankIdx];bankAnswered=false;
+  c.innerHTML=`<div class="quiz-counter">Q${bankIdx+1} of ${bank.length} · ${activeBankKey}</div><div class="quiz-card"><div class="quiz-scenario">${q.scenario}</div><div class="quiz-q">${q.q}</div><div class="quiz-src">📋 ${q.src}</div><div class="quiz-options">${q.opts.map((o,i)=>`<button class="quiz-opt" onclick="answerQ(${i})">${o}</button>`).join('')}</div><div id="quiz-fb" style="display:none"></div></div>`;
+}
+function answerQ(i){
+  if(bankAnswered)return;bankAnswered=true;
+  const q=QUIZ_BANKS[activeBankKey][bankIdx];
+  document.querySelectorAll('.quiz-opt').forEach((o,idx)=>{o.disabled=true;if(idx===q.correct)o.classList.add('correct');});
+  if(i!==q.correct){document.querySelectorAll('.quiz-opt')[i].classList.add('wrong');}else{bankScore++;}
+  const fb=document.getElementById('quiz-fb');fb.style.display='block';
+  fb.className='quiz-feedback '+(i===q.correct?'correct':'wrong');fb.textContent=q.feedback;
+  setTimeout(()=>{bankIdx++;renderBankQuestion();},4000);
+}
+</script>
+</body>
+</html>

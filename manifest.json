@@ -1,0 +1,26 @@
+{
+  "name": "Port Dawg — 2T2 Pocket Guide",
+  "short_name": "Port Dawg",
+  "description": "Unofficial training and reference tool for 2T2 Aerial Porters. Calculators, checklists, section guides, and practice quizzes.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0c10",
+  "theme_color": "#f59e0b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "utilities"],
+  "screenshots": []
+}
